@@ -128,17 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     scrollToTopButton.addEventListener('click', () => {
-        const duration = 500; // 500 milisaniye (yarım saniye)
-        const scrollStep = -window.scrollY / (duration / 15);
-        
-        function scrollAnimation() {
-            if (window.scrollY !== 0) {
-                window.scrollBy(0, scrollStep);
-                requestAnimationFrame(scrollAnimation);
-            }
-        }
-        
-        requestAnimationFrame(scrollAnimation);
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
 });
 
