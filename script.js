@@ -1,4 +1,4 @@
-let currentFilter = 'all';
+let currentFilter = 'hepsi';
 let allItems = [];
 
 function getItems(){
@@ -16,9 +16,9 @@ function getItems(){
 
 function filterItems(items, filter) {
     switch(filter) {
-        case 'active':
+        case 'alınmadı':
             return items.filter(item => item.status === 'active');
-        case 'completed':
+        case 'alındı':
             return items.filter(item => item.status === 'completed');
         default:
             return items;
@@ -37,19 +37,20 @@ function updateFilterButtons() {
 
     // Aktif butonu işaretle
     buttons.forEach(button => {
-        if(button.textContent.toLowerCase() === currentFilter) {
+        const buttonText = button.textContent.toLowerCase();
+        if(buttonText === currentFilter) {
             button.classList.add('active');
             button.style.color = '#00ffc4';
 
             // Eğer "Hepsi" butonu değilse, "Hepsi" butonunu gri yap
-            if(button !== allButton) {
+            if(buttonText !== 'hepsi') {
                 allButton.style.color = '#666';
             }
         }
     });
 
     // Sayfa ilk yüklendiğinde veya "Hepsi" seçildiğinde
-    if(currentFilter === 'all') {
+    if(currentFilter === 'hepsi') {
         allButton.style.color = '#00ffc4';
     }
 }
@@ -59,6 +60,7 @@ function generateItems(items){
     items.forEach((item) => {
         let todoItem = document.createElement("div");
         todoItem.classList.add("todo-item");
+        todoItem.setAttribute('data-id', item.id);
         
         let checkContainer = document.createElement("div");
         checkContainer.classList.add("check");
@@ -78,13 +80,16 @@ function generateItems(items){
         }
 
         const toggleComplete = (e) => {
-            if (!e.target.classList.contains('delete-button')) {
+            if (!e.target.closest('.delete-button')) {
                 markCompleted(item.id);
             }
         };
 
         todoItem.addEventListener("click", toggleComplete);
-        deleteButton.addEventListener("click", () => deleteItem(item.id));
+        deleteButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteItem(item.id);
+        });
         
         todoItem.appendChild(checkContainer);
         todoItem.appendChild(todoText);
@@ -120,13 +125,18 @@ function markCompleted(id){
 }
 
 function deleteItem(id) {
-    db.collection("todo-items").doc(id).delete()
-        .then(() => {
-            console.log("Todo başarıyla silindi");
-        })
-        .catch((error) => {
-            console.error("Todo silinirken hata oluştu:", error);
-        });
+    const todoItem = document.querySelector(`[data-id="${id}"]`);
+    todoItem.classList.add('deleting');
+    
+    setTimeout(() => {
+        db.collection("todo-items").doc(id).delete()
+            .then(() => {
+                console.log("Todo başarıyla silindi");
+            })
+            .catch((error) => {
+                console.error("Todo silinirken hata oluştu:", error);
+            });
+    }, 300);
 }
 
 // Event listener'ları ekle
