@@ -128,7 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     scrollToTopButton.addEventListener('click', () => {
-        const scrollStep = -window.scrollY / (1000 / 15); // 1 saniye sürecek
+        const duration = 500; // 500 milisaniye (yarım saniye)
+        const scrollStep = -window.scrollY / (duration / 15);
         
         function scrollAnimation() {
             if (window.scrollY !== 0) {
