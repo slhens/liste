@@ -2,7 +2,9 @@ let currentFilter = 'all';
 let allItems = [];
 
 function getItems(){
-    db.collection("todo-items").onSnapshot((snapshot) => {
+    db.collection("todo-items")
+    .orderBy("timestamp", "desc")
+    .onSnapshot((snapshot) => {
         allItems = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -24,12 +26,32 @@ function filterItems(items, filter) {
 }
 
 function updateFilterButtons() {
-    document.querySelectorAll('.items-statuses span').forEach(button => {
+    const buttons = document.querySelectorAll('.items-statuses span');
+    const allButton = buttons[0]; // "Hepsi" butonu
+
+    // Önce tüm butonları sıfırla
+    buttons.forEach(button => {
         button.classList.remove('active');
+        button.style.color = '#666';
+    });
+
+    // Aktif butonu işaretle
+    buttons.forEach(button => {
         if(button.textContent.toLowerCase() === currentFilter) {
             button.classList.add('active');
+            button.style.color = '#00ffc4';
+
+            // Eğer "Hepsi" butonu değilse, "Hepsi" butonunu gri yap
+            if(button !== allButton) {
+                allButton.style.color = '#666';
+            }
         }
     });
+
+    // Sayfa ilk yüklendiğinde veya "Hepsi" seçildiğinde
+    if(currentFilter === 'all') {
+        allButton.style.color = '#00ffc4';
+    }
 }
 
 function generateItems(items){
@@ -78,7 +100,8 @@ function addItem(event){
     if(text.value.trim() !== "") {
         let newItem = db.collection("todo-items").add({
             text: text.value,
-            status: "active"
+            status: "active",
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         text.value = "";
     }

@@ -2,6 +2,8 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
 
 html {
@@ -97,7 +99,10 @@ body {
     cursor: pointer;
     margin-top: 1rem;
     border-radius: 2rem;
-    
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .todo-item:hover {
@@ -200,7 +205,7 @@ body {
 }
 
 .items-statuses .active {
-    color: #00ffc4;
+    color: #00ffc4 !important;
 }
 
 .items-clear {
