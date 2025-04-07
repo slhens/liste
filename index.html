@@ -13,12 +13,19 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="title">SiNAN'IN TORUNLARI MALİKANESİ ALIŞVERİŞ LİSTESİ</h1>
+        <div class="title-container">
+            <h1 class="title" id="page-title">SiNAN'IN TORUNLARI MALİKANESİ ALIŞVERİŞ LİSTESİ</h1>
+            <button id="edit-title-button" class="edit-title-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+            </button>
+        </div>
         <div class="new-todo">
-            <form onsubmit="addItem(event)">
-                <input type="text" id="todo-input" placeholder="Ne alınacak?">
-                <button type="submit" class="add-button">EKLE</button>
-            </form>
+            <div class="combined-input-container">
+                <input type="text" id="combined-input" placeholder="Ekle veya ara...">
+                <button id="add-button" class="add-button">EKLE</button>
+            </div>
             <div class="todo-items-info">
                 <div class="items-statuses">
                     <span class="active">Hepsi</span>
