@@ -271,6 +271,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const addButton = document.getElementById('add-button');
     const editTitleButton = document.getElementById('edit-title-button');
     const titleElement = document.getElementById('page-title');
+    const clearCompletedButton = document.getElementById('clear-completed');
+    const clearAllButton = document.getElementById('clear-all');
+    const yearElement = document.getElementById('year');
+    
+    // Yıl bilgisini ekle
+    yearElement.textContent = new Date().getFullYear();
+    
+    // Tamamlananları temizle
+    clearCompletedButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        if (confirm('Tamamlanan tüm öğeleri silmek istediğinize emin misiniz?')) {
+            const completedItems = allItems.filter(item => item.status === 'completed');
+            
+            // Önce animasyon gösterme
+            completedItems.forEach(item => {
+                const todoItem = document.querySelector(`[data-id="${item.id}"]`);
+                if (todoItem) {
+                    todoItem.classList.add('deleting');
+                }
+            });
+            
+            // Sonra silme işlemi
+            setTimeout(() => {
+                const batch = db.batch();
+                
+                completedItems.forEach(item => {
+                    const docRef = db.collection("todo-items").doc(item.id);
+                    batch.delete(docRef);
+                });
+                
+                batch.commit()
+                    .then(() => {
+                        console.log(`${completedItems.length} tamamlanmış öğe silindi`);
+                    })
+                    .catch((error) => {
+                        console.error("Toplu silme işleminde hata:", error);
+                    });
+            }, 300);
+        }
+    });
+    
+    // Tümünü temizle
+    clearAllButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        if (confirm('TÜM öğeleri silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+            // Önce animasyon gösterme
+            allItems.forEach(item => {
+                const todoItem = document.querySelector(`[data-id="${item.id}"]`);
+                if (todoItem) {
+                    todoItem.classList.add('deleting');
+                }
+            });
+            
+            // Sonra silme işlemi
+            setTimeout(() => {
+                const batch = db.batch();
+                
+                allItems.forEach(item => {
+                    const docRef = db.collection("todo-items").doc(item.id);
+                    batch.delete(docRef);
+                });
+                
+                batch.commit()
+                    .then(() => {
+                        console.log(`${allItems.length} öğe silindi`);
+                    })
+                    .catch((error) => {
+                        console.error("Toplu silme işleminde hata:", error);
+                    });
+            }, 300);
+        }
+    });
     
     // Sayfa başlığını veritabanından al ve güncelle
     db.collection("app-settings").doc("title").get().then((doc) => {
@@ -297,19 +371,27 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mevcut başlığı gizle
         titleElement.style.display = 'none';
         
-        // Input oluştur
-        const titleInput = document.createElement('input');
-        titleInput.type = 'text';
+        // Input oluştur (textarea olarak)
+        const titleInput = document.createElement('textarea');
         titleInput.className = 'title-input';
         titleInput.value = pageTitle;
-        titleInput.maxLength = 50; // Maksimum uzunluk sınırı
+        titleInput.maxLength = 100; // Maksimum uzunluk sınırı
         
         // Input'u sayfaya ekle
         titleElement.parentNode.insertBefore(titleInput, titleElement);
         
         // Input'a odaklan
         titleInput.focus();
-        titleInput.select();
+        
+        // Input alanını otomatik olarak içeriğe göre boyutlandır
+        titleInput.style.height = 'auto';
+        titleInput.style.height = titleInput.scrollHeight + 'px';
+        
+        // Metin değiştiğinde yüksekliği ayarla
+        titleInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
         
         // Düzenleme butonunu kaydet butonuna çevir
         editTitleButton.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00ffc4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
